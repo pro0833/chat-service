@@ -4,8 +4,9 @@ function connect() {
     let socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
 
-    stompClient.connect({}, function () {
-        console.log("Connected");
+    stompClient.connect({ userId: senderId }, // header
+     function () {
+         console.log("Connected as user " + senderId);
     });
 }
 

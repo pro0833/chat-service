@@ -5,7 +5,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "chat_messages")
+@Table(
+        name = "chat_messages",
+        indexes = {
+                @Index(name = "idx_sender", columnList = "senderId"),
+                @Index(name = "idx_receiver", columnList = "receiverId")
+        }
+)
 public class ChatMessage {
 
   @Id

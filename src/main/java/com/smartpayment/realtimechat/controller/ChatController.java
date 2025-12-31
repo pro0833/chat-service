@@ -25,6 +25,7 @@ public class ChatController {
     ChatMessage saved = chatService.save(dto);
 
     // send to receiver only (1-to-1)
+
     messagingTemplate.convertAndSend(
         "/topic/chat/" + dto.receiverId,
         saved

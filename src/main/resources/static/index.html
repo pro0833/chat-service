@@ -52,8 +52,27 @@
 
 <script>
   let stompClient = null;
+  let historyLoaded = false;
 
+  function loadChatHistory() {
+    const sender = document.getElementById("sender").value;
+    const receiver = document.getElementById("receiver").value;
+
+    fetch(`/api/chat/history/${sender}/${receiver}`)
+        .then(res => res.json())
+        .then(messages => {
+            const chatBox = document.getElementById("chatBox");
+            chatBox.innerHTML = "";
+
+            messages.forEach(msg => {
+                showMessage(msg);
+            });
+
+            historyLoaded = true;
+        });
+}
   function connectAndSubscribe() {
+
       const senderId = document.getElementById("sender").value;
 
       if (!senderId) {
@@ -64,16 +83,24 @@
       const socket = new SockJS('/ws');
       stompClient = Stomp.over(socket);
 
-      stompClient.connect({}, function () {
+      stompClient.connect({ userId: senderId }, function () {
           console.log("WebSocket Connected");
+
+          // 1️⃣ Load history first
+          loadChatHistory();
 
           // Subscribe to user-specific topic
           stompClient.subscribe('/topic/chat/' + senderId, function (message) {
-              showMessage(JSON.parse(message.body));
-          });
+               const msg = JSON.parse(message.body);
 
-          alert("Connected as User " + senderId);
+                // prevent duplicate if already shown in history
+
+            if (historyLoaded) {
+                showMessage(msg);
+            }
+          });
       });
+
   }
 
   function sendMessage() {
